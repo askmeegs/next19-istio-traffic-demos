@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: frontend-dr
+spec:
+  host: frontend
+  trafficPolicy:
+    connectionPool:  #client connections to frontend 
+      tcp:
+        maxConnections: 1 # num. clients envoy will allow to frontend at any time 
+      http:
+        http1MaxPendingRequests: 1 # size of the request queue for frontend  
+        maxRequestsPerConnection: 1  
+# scan frontend every second. if > 1 consecutive 5XX error, remove frontend from the pool for 3mins
+    outlierDetection:
+      interval: 1s               
+      consecutiveErrors: 1      
+      baseEjectionTime: 3m      
+      maxEjectionPercent: 100    
